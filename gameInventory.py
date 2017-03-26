@@ -1,38 +1,136 @@
-# This is the file where you must work. Write code in the functions, create new functions, 
-# so they work according to the specification
+import csv
+import time
+
+inv = {
+    "rope": 1,
+    "torch": 6,
+    "gold coin": 42,
+    "dagger": 1,
+    "arrow": 12
+    }
+items_quantity = []
+table = []
+
+
+# Counts how many items you have in total
+def item_quantity(where):
+    global items_quantity
+    items_quantity = [where[values] for values in sorted(where, reverse=True)]
+    return str(sum(items_quantity))
+
+
+# List about your items
+def item_table(inventory):
+    global table
+    table = [i for i in sorted(inventory, key=inventory.get, reverse=True)]
+    return table
+
 
 # Displays the inventory.
 def display_inventory(inventory):
-    pass
+    global items_quantity, inv, table
+    item_quantity(inv)
+    item_table(inv)
+    try:
+        # If you type 'inventory' or 'inv', it's gonna show the whole inventory.
+        if (inventory == "inventory") or (inventory == "inv"):
+            print("\nInventory: ")
+            for item in sorted(inv):
+                print(str(item).capitalize()+": "+str(inv[item]))
+            return "\nTotal number of items: "+str(sum(items_quantity))
+        else:
+            # If you want to check only one item.
+            return "\n{} ".format(inv[inventory])+str(inventory).capitalize()+" you have."
+    except KeyError:
+        return "You don't have the {}...yet.".format(inventory.capitalize())
 
 
-# Adds to the inventory dictionary a list of items from added_items.
 def add_to_inventory(inventory, added_items):
-    pass
+    global item_quantity, inv
+    inv = inventory
+    loot_dict = {}
+    n = 0
+    for item in added_items:
+        loot_dict.update({added_items[n]: added_items.count(added_items[n])})
+        n += 1
+    loot_list = [items for items in loot_dict]
+    loot_list = sorted(loot_list)
+    n = 0
+    for i in loot_dict:
+        if loot_list[n] in inv:
+            inv.update({loot_list[n]: inv[loot_list[n]]+loot_dict[loot_list[n]]})
+            n += 1
+        else:
+            inv.update({loot_list[n]: loot_dict[loot_list[n]]})
+            n += 1
+    item_quantity(inv)
+    return "\nThe new item(s), Sir: "+str(loot_dict)+"\n"
+    # Just in case...
+    # for item in sorted(inv):
+    #    print(str(item).capitalize()+": "+str(inv[item]))'
+    # return "Total number of items: "+str(sum(items_quantity))+"\n---------------------------------------------"
 
 
-# Takes your inventory and displays it in a well-organized table with 
-# each column right-justified. The input argument is an order parameter (string)
-# which works as the following:
-# - None (by default) means the table is unordered
-# - "count,desc" means the table is ordered by count (of items in the inventory) 
-#   in descending order
-# - "count,asc" means the table is ordered by count in ascending order
-def print_table(inventory, order=None):
-    pass
+def print_table(inventory=None, order=None):
+    global inv, table
+    item_table(inv)
+    print("\nInventory:\ncount".rjust(5, ' '), "item name\n".rjust(20, ' '), "-".rjust(26, '-'))
+    # Numeric order
+    if order == "-count,desc":
+        n = len(inv)
+        for i in inv:
+            print(str(inv[table[n-1]]).rjust(5, ' '), table[n-1].capitalize().rjust(20, ' '))
+            n -= 1
+    elif order == "count,desc":
+        n = 0
+        for i in inv:
+            print(str(inv[table[n]]).rjust(5, ' '), table[n].capitalize().rjust(20, ' '))
+            n += 1
+    # Alphabetical order
+    elif order == "count,asc":
+        for item in sorted(inv):
+            print(str(inv[item]).rjust(5, ' '), str(item).capitalize().rjust(20, ' '))
+    elif order == "-count,asc":
+        for item in sorted(inv, reverse=True):
+            print(str(inv[item]).rjust(5, ' '), str(item).capitalize().rjust(20, ' '))
+    # None? No problem!
+    else:
+        n = 0
+        for i in inv:
+            print(str(inv[table[n]]).rjust(5, ' '), table[n].capitalize().rjust(20, ' '))
+            n += 1
+        return "\nNo arguments senor?\n(e.g. inv, 'count,desc' or inv, 'count,asc')\nPsst, reverse goes with -"
+    return "-".rjust(26, '-')
 
 
-# Imports new inventory items from a file
-# The filename comes as an argument, but by default it's 
-# "import_inventory.csv". The import automatically merges items by name.
-# The file format is plain text with comma separated values (CSV).
 def import_inventory(inventory, filename="import_inventory.csv"):
-    pass
+    rfile = open(filename, "r")
+    reader = csv.reader(rfile)
+    basic_list = [i for i in reader]
+    import_list = []
+    n, m = 0, 0
+    for i in basic_list:
+        for i in basic_list[m]:
+            import_list.append(basic_list[m][n])
+            n += 1
+        m += 1
+        n = 0
+    rfile.close()
+    add_to_inventory(inventory, import_list)
+    return rfile.close()
 
 
-# Exports the inventory into a .csv file.
-# if the filename argument is None it creates and overwrites a file
-# called "export_inventory.csv". The file format is the same plain text 
-# with comma separated values (CSV).
-def export_inventory(inventory, filename="export_inventory.csv"):
-    pass
+def export_inventory(inventory, filename):
+    wfile = open(filename, "w")
+    writer = csv.writer(wfile)
+    slx = []
+    slk = [i for i in inventory]
+    slk = sorted(slk)
+    n = 0
+    for i in sorted(inventory):
+        for i in range(inventory[i]):
+            slx.append(slk[n])
+        n += 1
+    writer.writerow(slx)
+    wfile.close()
+    return "Done"
