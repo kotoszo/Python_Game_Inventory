@@ -41,7 +41,7 @@ def display_inventory(inventory):
 
 def add_to_inventory(inventory, added_items):
     global item_quantity, inv
-    # Yeah, i'm was lazy
+    # Yeah, i was lazy wti that one
     inv = inventory
     loot_dict = {}
     n = 0
