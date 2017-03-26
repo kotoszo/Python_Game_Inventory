@@ -1,13 +1,7 @@
 import csv
 import time
 
-inv = {
-    "rope": 1,
-    "torch": 6,
-    "gold coin": 42,
-    "dagger": 1,
-    "arrow": 12
-    }
+inv = {}
 items_quantity = []
 table = []
 
@@ -47,6 +41,7 @@ def display_inventory(inventory):
 
 def add_to_inventory(inventory, added_items):
     global item_quantity, inv
+    # Yeah, i'm was lazy
     inv = inventory
     loot_dict = {}
     n = 0
